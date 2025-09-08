@@ -70,30 +70,6 @@ def handle_join_game(data):
         emit("error", {"message": "Game not found"})
         return
 
-    player = {
-        "id": str(uuid4()),
-        "name": player_name,
-        "is_imposter": False,
-        "sid": request.sid,
-    }
-    game["players"].append(player)
-    game_cache.set(game_id, game)
-
-    join_room(game_id)
-
-    emit("player_joined", {"player": serialize_player(player)}, to=game_id)
-
-
-@socketio.on("join_game")
-def handle_join_game(data):
-    game_id = data.get("game_id")
-    player_name = data.get("name", "Player")
-
-    game = game_cache.get(game_id)
-    if not game:
-        emit("error", {"message": "Game not found"})
-        return
-
     player_id = str(uuid4())
     player = Player(
         id=player_id,
