@@ -108,3 +108,17 @@ def handle_start_game(data):
         emit("role_assigned", {"role": role, "question": question}, room=p.sid)
 
     emit("game_started", {"imposters": game.imposters}, to=game_id)
+
+@socketio.on("push_game_state")
+def handle_push_game_state(data):
+    game_id = data.get("game_id")
+    game: GameInfo = game_cache.get(game_id)
+
+    if not game:
+        emit("error", {"message": "Game not found"})
+        return
+
+    new_state = game.next_state()
+    game_cache.set(game_id, game)
+
+    emit("game_state_updated", {"current_state": new_state}, to=game_id)
